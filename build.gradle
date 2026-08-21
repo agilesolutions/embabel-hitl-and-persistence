@@ -24,6 +24,7 @@ dependencies {
 	implementation libs.spring.boot.starter.security
 	implementation libs.spring.boot.starter.oauth2.resource.server
 	implementation libs.spring.boot.starter.actuator
+	implementation libs.spring.retry
 	implementation libs.micrometer.registry.prometheus
 
 	// Persistency & Audit Trailing

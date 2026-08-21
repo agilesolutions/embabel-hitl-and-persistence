@@ -4,6 +4,7 @@ springFramework = "7.0.0"
 jakartaEe = "11.0.0"
 hibernate = "7.0.0.Beta1"
 postgresql = "42.7.2"
+springRetry = "2.0.12"
 embabel-agent = "0.3.5"
 embabel-common = "2.0.1"
 testcontainers = "1.20.1"
@@ -19,6 +20,7 @@ spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-
 spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
 spring-boot-starter-oauth2-resource-server = { module = "org.springframework.boot:spring-boot-starter-oauth2-resource-server" }
 spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-retry = { module = "org.springframework.retry:spring-retry", version.ref = "springRetry" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
 
 flyway-core = { module = "org.flywaydb:flyway-core" }
