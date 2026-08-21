@@ -1,0 +1,60 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.1.1'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.agilesolutions'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+}
+
+ext {
+	set('springAiVersion', "2.0.0")
+}
+
+dependencies {
+	// Spring Boot & Jakarta Baseline
+	implementation libs.spring.boot.starter.web
+	implementation libs.spring.boot.starter.data.jpa
+	implementation libs.spring.boot.starter.security
+	implementation libs.spring.boot.starter.oauth2.resource.server
+	implementation libs.spring.boot.starter.actuator
+	implementation libs.micrometer.registry.prometheus
+
+	// Persistency & Audit Trailing
+	implementation libs.flyway.core
+	implementation libs.flyway.database.postgresql
+	runtimeOnly libs.postgresql
+	implementation libs.hibernate.envers
+	implementation libs.spring.data.envers
+
+	// Embabel Platform SDK
+	implementation libs.embabel.common
+	implementation libs.embabel.agent
+	implementation libs.embabel.agent.shell
+
+    implementation libs.lombok
+    annotationProcessor libs.lombok
+
+    // Testing Scope
+	testImplementation libs.spring.boot.starter.test
+	testImplementation libs.spring.boot.testcontainers
+	testImplementation libs.testcontainers.junit.jupiter
+	testImplementation libs.testcontainers.postgresql
+	testImplementation libs.testcontainers.grafana
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
