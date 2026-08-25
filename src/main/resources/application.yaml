@@ -1,3 +1,13 @@
 spring:
   application:
     name: embabel
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/embabel
+    username: embabel
+    password: embabel
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
