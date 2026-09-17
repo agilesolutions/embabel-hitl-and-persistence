@@ -6,9 +6,19 @@ The workflow leverages an asynchronous **Embabel Agent** that executes automated
 
 **Note**: This demo originally focused on persisting Blackboard worldstate snapshots on a PostgreSQL backend. The current design has been refactored to use a more generic Embabel Agent workflow, which can be adapted to various HITL scenarios.
 
-## Another direction on Blackboard Persistence
-- [Full persistence implementation details](docus/roadmap.md)
+## Current Embabel development line
+As of **17 September 2026**, the repository has moved into a 2.0.0 development stream.
 
+There is an important correction to my earlier setup: the persistence API is now real and documented in the current development stream. It is no longer merely a future concept.
+
+The GitHub activity explicitly shows:
+
+- branch: 2.0.0
+- Start 2.0.0 Dev Stream
+- Switch to embabel-common 2.0.0
+- Update to dependency parent 2.0.0-SNAPSHOT
+
+The project's release-branch documentation says that main **is reserved for the Spring 2.x development stream**, while 1.0.x is the maintenance/development branch for Spring AI 1.x.
 
 ---
 
@@ -475,6 +485,133 @@ which is a much better basis for the Spring Boot 4 + Kubernetes + PostgreSQL + E
 - [Current Embabel persistence documentation](https://docs.embabel.com/embabel-agent/guide/1.5.3-SNAPSHOT/#reference.persistence)
 - [Persistence checkpointing issue #2005](https://github.com/embabel/embabel-agent/issues/2005?utm_source=chatgpt.com)
 
+## My specific implementation
+So my architecture is now:
+```
+embabel-agent-starter
+        │
+        ├── AgentProcess
+        ├── Blackboard
+        ├── WorldState
+        ├── AgentProcessPersistence
+        ├── PersistentAgentProcessRepository
+        ├── AgentProcessSnapshotStore
+        └── BlackboardEntrySerializer
+                     │
+                     │ your implementation
+                     ▼
+             PostgreSQL / JDBC
+```
+
+### My PostgreSQL implementation
+I will implement a `PostgresAgentProcessSnapshotStore` that implements the `AgentProcessSnapshotStore` interface. This will handle the persistence of snapshots in a PostgreSQL database, using JSONB for the payload and supporting optimistic locking with a version field.
+```
+src/main/java/
+└── com/agilesolutions/embabel/persistence/
+    ├── PostgresAgentProcessSnapshotStore.java
+    ├── PostgresAgentProcessSnapshotRepository.java
+    └── PostgresPersistenceConfiguration.java
+```
+My keyclass is:
+```
+@Component
+public class PostgresAgentProcessSnapshotStore
+        implements AgentProcessSnapshotStore {
+
+    // JDBC implementation
+}
+```
+And then Spring automatically detects it and uses it in the `PersistentAgentProcessRepository`.
+```
+embabel:
+  agent:
+    platform:
+      persistence:
+        enabled: true
+        checkpoint-policy: LIFECYCLE
+```
+The documentation policies are:
+```
+WAITING
+LIFECYCLE
+``` 
+WAITING is particularly interesting for your human-in-the-loop use case because it checkpoints processes parked at waitFor. LIFECYCLE additionally persists terminal states.
+
+### PostgreSQL schema
+I start for now with something like this:
+```
+CREATE TABLE agent_process_snapshot (
+    process_id      UUID PRIMARY KEY,
+
+    parent_id       UUID,
+
+    agent_name      VARCHAR(255) NOT NULL,
+
+    status          VARCHAR(64) NOT NULL,
+
+    content_type    VARCHAR(255) NOT NULL,
+
+    payload         JSONB NOT NULL,
+
+    version         BIGINT NOT NULL,
+
+    created_at      TIMESTAMP WITH TIME ZONE NOT NULL,
+
+    updated_at      TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE INDEX idx_agent_process_snapshot_parent
+    ON agent_process_snapshot(parent_id);
+
+CREATE INDEX idx_agent_process_snapshot_status
+    ON agent_process_snapshot(status);
+
+CREATE INDEX idx_agent_process_snapshot_agent
+    ON agent_process_snapshot(agent_name);
+```
+
+### TestContainers
+I will use TestContainers to run a PostgreSQL instance for integration testing. This allows me to test the persistence layer in an isolated environment without requiring a separate database setup.
+
+```
+JUnit
+  │
+  ▼
+PostgreSQL Testcontainer
+  │
+  ▼
+Embabel Agent
+  │
+  ▼
+AgentProcess
+  │
+  ▼
+WAITING
+  │
+  ▼
+PostgresAgentProcessSnapshotStore
+  │
+  ▼
+PostgreSQL
+  │
+  │  destroy runtime process
+  │
+  ▼
+restore
+  │
+  ▼
+Blackboard
+  │
+  ▼
+WorldState
+  │
+  ▼
+resume
+```
+
+
+    
+    
 
 
 ---

@@ -36,13 +36,13 @@ dependencies {
 	implementation libs.spring.data.envers
 
 	// Embabel Platform SDK
-	implementation libs.embabel.agent
-	implementation libs.embabel.agent.shell
+	implementation(libs.embabel.agent.starter)
 
     implementation libs.lombok
     annotationProcessor libs.lombok
 
     // Testing Scope
+	testImplementation(libs.embabel.agent.test)
 	testImplementation libs.spring.boot.starter.test
 	testImplementation libs.spring.boot.testcontainers
 	testImplementation libs.testcontainers.junit.jupiter
