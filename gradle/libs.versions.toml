@@ -1,12 +1,10 @@
 [versions]
-springBoot = "4.0.0"
+springBoot = "4.1.0"
 springFramework = "7.0.0"
-jakartaEe = "11.0.0"
 hibernate = "7.0.0.Beta1"
 postgresql = "42.7.2"
 springRetry = "2.0.12"
-embabel-agent = "1.0.0"
-embabel-common = "2.0.1"
+embabel = "2.0.0-SNAPSHOT"
 testcontainers = "1.20.1"
 
 [plugins]
@@ -30,8 +28,8 @@ postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" 
 hibernate-envers = { module = "org.hibernate.orm:hibernate-envers", version.ref = "hibernate" }
 spring-data-envers = { module = "org.springframework.data:spring-data-envers" }
 
-embabel-agent = { module = "com.embabel.agent:embabel-agent-ai", version.ref = "embabel-agent" }
-embabel-agent-shell = { module = "com.embabel.agent:embabel-agent-starter", version.ref = "embabel-agent" }
+embabel-agent-starter = {module = "com.embabel.agent:embabel-agent-starter", version.ref = "embabel" }
+embabel-agent-test = {module = "com.embabel.agent:embabel-agent-test", version.ref = "embabel"}
 
 lombok = { module = "org.projectlombok:lombok", version = "1.18.44" }
 

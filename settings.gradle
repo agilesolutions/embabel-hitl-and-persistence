@@ -9,6 +9,29 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         mavenCentral()
+        // Official Embabel Releases Repository
+        maven {
+            name = 'embabel-releases'
+            url = 'https://repo.embabel.com/artifactory/libs-release'
+            mavenContent {
+                releasesOnly()
+            }
+        }
+
+        // Official Embabel Snapshots Repository
+        maven {
+            name = 'embabel-snapshots'
+            url = 'https://repo.embabel.com/artifactory/libs-snapshot'
+            mavenContent {
+                snapshotsOnly()
+            }
+        }
+
+        // Spring Milestones (Embabel relies heavily on Spring AI milestones)
+        maven {
+            name = 'Spring Milestones'
+            url = 'https://repo.spring.io/milestone'
+        }
     }
 }
 
