@@ -49,8 +49,8 @@ public class PostgresAgentProcessSnapshotStore implements AgentProcessSnapshotSt
                     .addValue("content_type", snapshot.getContentType())
                     .addValue("payload", snapshot.getPayload())
                     .addValue("version", snapshot.getVersion())
-                    .addValue("created_at", snapshot.getCreatedAt())
-                    .addValue("updated_at", snapshot.getUpdatedAt());
+                                        .addValue("created_at", java.sql.Timestamp.from(snapshot.getCreatedAt()))
+                                        .addValue("updated_at", java.sql.Timestamp.from(snapshot.getUpdatedAt()));
             try {
                 jdbc.update(insert, params);
             } catch (DuplicateKeyException ex) {
@@ -75,7 +75,7 @@ public class PostgresAgentProcessSnapshotStore implements AgentProcessSnapshotSt
                 .addValue("content_type", snapshot.getContentType())
                 .addValue("payload", snapshot.getPayload())
                 .addValue("new_version", newVersion)
-                .addValue("updated_at", now)
+                                .addValue("updated_at", java.sql.Timestamp.from(now))
                 .addValue("process_id", snapshot.getProcessId())
                 .addValue("expected_version", expected);
 
