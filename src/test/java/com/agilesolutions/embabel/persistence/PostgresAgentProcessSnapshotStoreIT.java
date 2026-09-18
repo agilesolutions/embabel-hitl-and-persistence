@@ -18,7 +18,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Import(TestcontainersConfiguration.class)
-@SpringBootTest(classes = EmbabelApplication.class)
+@SpringBootTest(classes = {PostgresPersistenceConfiguration.class, PostgresAgentProcessSnapshotStore.class, TestcontainersConfiguration.class})
 class PostgresAgentProcessSnapshotStoreIT {
 
     @Autowired
