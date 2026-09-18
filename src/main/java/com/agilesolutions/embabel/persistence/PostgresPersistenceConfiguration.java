@@ -36,10 +36,18 @@ public class PostgresPersistenceConfiguration {
     @Bean
     @ConditionalOnBean(DataSource.class)
     public PostgresAgentProcessSnapshotStore postgresAgentProcessSnapshotStore(NamedParameterJdbcTemplate jdbc, DataSource ds) {
-        // Ensure schema exists
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(new ByteArrayResource(DDL.getBytes()));
-        populator.execute(ds);
+        // Ensure schema exists - execute DDL statements individually to avoid driver-specific parsing issues
+        try (var conn = ds.getConnection(); var stmt = conn.createStatement()) {
+            String[] statements = DDL.split(";\\s*");
+            for (String s : statements) {
+                String sql = s.trim();
+                if (!sql.isEmpty()) {
+                    stmt.execute(sql);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize agent_process_snapshot schema", e);
+        }
         return new PostgresAgentProcessSnapshotStore(jdbc);
     }
 }
