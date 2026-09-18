@@ -24,9 +24,36 @@ class PostgresAgentProcessSnapshotStoreIT {
     @Autowired
     PostgresAgentProcessSnapshotStore store;
 
+    @Autowired
+    org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate jdbc;
+
+    private static final String DDL = "CREATE TABLE IF NOT EXISTS agent_process_snapshot (" +
+            "process_id UUID PRIMARY KEY, " +
+            "parent_id UUID, " +
+            "agent_name VARCHAR(255) NOT NULL, " +
+            "status VARCHAR(64) NOT NULL, " +
+            "content_type VARCHAR(255) NOT NULL, " +
+            "payload JSONB NOT NULL, " +
+            "version BIGINT NOT NULL, " +
+            "created_at TIMESTAMP WITH TIME ZONE NOT NULL, " +
+            "updated_at TIMESTAMP WITH TIME ZONE NOT NULL" +
+            ")";
+
     @BeforeEach
     void setUp() {
-        // no-op
+        // Ensure schema exists for the tests
+        String[] statements = DDL.split(";\\s*");
+        var ds = jdbc.getJdbcTemplate().getDataSource();
+        try (var conn = ds.getConnection(); var stmt = conn.createStatement()) {
+            for (String s : statements) {
+                String sql = s.trim();
+                if (!sql.isEmpty()) {
+                    stmt.execute(sql);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterEach
