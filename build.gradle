@@ -31,7 +31,7 @@ dependencies {
 	// Persistency & Audit Trailing
 	implementation libs.flyway.core
 	implementation libs.flyway.database.postgresql
-	runtimeOnly libs.postgresql
+	implementation libs.postgresql
 	implementation libs.hibernate.envers
 	implementation libs.spring.data.envers
 

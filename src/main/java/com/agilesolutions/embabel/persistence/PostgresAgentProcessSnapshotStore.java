@@ -1,16 +1,16 @@
 package com.agilesolutions.embabel.persistence;
 
+import org.postgresql.util.PGobject;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,7 +47,7 @@ public class PostgresAgentProcessSnapshotStore implements AgentProcessSnapshotSt
                     .addValue("agent_name", snapshot.getAgentName())
                     .addValue("status", snapshot.getStatus())
                     .addValue("content_type", snapshot.getContentType())
-                    .addValue("payload", snapshot.getPayload())
+                    .addValue("payload", toJsonb(snapshot.getPayload()))
                     .addValue("version", snapshot.getVersion())
                                         .addValue("created_at", java.sql.Timestamp.from(snapshot.getCreatedAt()))
                                         .addValue("updated_at", java.sql.Timestamp.from(snapshot.getUpdatedAt()));
@@ -73,7 +73,7 @@ public class PostgresAgentProcessSnapshotStore implements AgentProcessSnapshotSt
                 .addValue("agent_name", snapshot.getAgentName())
                 .addValue("status", snapshot.getStatus())
                 .addValue("content_type", snapshot.getContentType())
-                .addValue("payload", snapshot.getPayload())
+                .addValue("payload", toJsonb(snapshot.getPayload()))
                 .addValue("new_version", newVersion)
                                 .addValue("updated_at", java.sql.Timestamp.from(now))
                 .addValue("process_id", snapshot.getProcessId())
@@ -135,4 +135,16 @@ public class PostgresAgentProcessSnapshotStore implements AgentProcessSnapshotSt
             return new AgentProcessSnapshot(processId, parentId, agentName, status, contentType, payload, version, createdAt, updatedAt);
         }
     }
+
+    private static PGobject toJsonb(String json) {
+        try {
+            PGobject o = new PGobject();
+            o.setType("jsonb");
+            o.setValue(json);
+            return o;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create PGobject for jsonb", e);
+        }
+    }
 }
+

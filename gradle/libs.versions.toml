@@ -2,7 +2,7 @@
 springBoot = "4.1.0"
 springFramework = "7.0.0"
 hibernate = "7.0.0.Beta1"
-postgresql = "42.7.2"
+postgresql = "42.7.6"
 springRetry = "2.0.12"
 embabel = "2.0.0-SNAPSHOT"
 testcontainers = "1.20.1"
